@@ -4,29 +4,28 @@ import pandas as pd
 st.set_page_config(page_title="Γαμος Νικου - Βασιλικης", layout="wide")
 st.title("Λιστα καλεσμενων")
 
+# Read data from Excel file
 df = pd.read_excel("wedding.xlsx")
 df = df.fillna('')
 df['Τηλεφωνο'] = df['Τηλεφωνο'].astype(str).str.replace('[,.]', '')
 
-hide_table_row_index = """
-            <style>
-            thead tr th:first-child {display:none}
-            tbody th {display:none}
-            </style>
-            """
-
-# Inject CSS with Markdown
-st.markdown(hide_table_row_index, unsafe_allow_html=True)
-
-# Get unique values for the 'column_name' column
+# Get unique values for the 'Επωνυμο' column
 column_values = df['Επωνυμο '].tolist()
 
-# Allow user to select one or multiple values from the 'column_name' column
+# Allow user to select one or multiple values from the 'Επωνυμο' column
 selected_values = st.multiselect('Επιλογη επωνυμου καλεσμενου', column_values)
 
 # Filter the data based on the selected values
 if selected_values:
-    df = df[df['Επωνυμο '].isin(selected_values)]
-
-
-st.table(df)
+    filtered_df = df[df['Επωνυμο '].isin(selected_values)]
+    edited_df = st.experimental_data_editor(filtered_df, num_rows="dynamic")
+    if st.button('Save changes'):
+        # Update the original Excel file with the changes made in the data editor
+        df.update(edited_df)
+        df.to_excel("wedding.xlsx", index=False)
+else:
+    edited_df = st.experimental_data_editor(df, num_rows="dynamic")
+    if st.button('Save changes'):
+        # Update the original Excel file with the changes made in the data editor
+        df.update(edited_df)
+        df.to_excel("wedding.xlsx", index=False)
