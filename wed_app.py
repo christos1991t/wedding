@@ -29,6 +29,8 @@ if selected_values:
         st.success("Η αλλαγες αποθηκευτικαν")
 else:
     edited_df = st.experimental_data_editor(df, num_rows="dynamic")
+    sum_guests =  edited_df['Ατομα'].sum()
+    st.text(f'Συνολο καλεσμενων {sum_guests}')
     if st.button('Αποθηκευση Αλλαγων'):
         # Update the original Excel file with the changes made in the data editor
         df.update(edited_df)
@@ -38,7 +40,7 @@ else:
 with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
     # Write each dataframe to a different worksheet.
     edited_df.to_excel(writer, sheet_name='Sheet1')
-      # Close the Pandas Excel writer and output the Excel file to the buffer
+    # Close the Pandas Excel writer and output the Excel file to the buffer
     writer.save()
 
     st.download_button(
